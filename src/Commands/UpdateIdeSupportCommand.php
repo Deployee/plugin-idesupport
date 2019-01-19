@@ -82,7 +82,7 @@ EOL;
 /**
  * This class was generated on {$date}
  */
-abstract class GeneratedDeployeeIdeSupportDefinitions
+abstract class deployee_ide_helper
 {
     {$helperMethods}
 }
