@@ -125,7 +125,7 @@ EOL;
 
             $signatur[] = trim(sprintf(
                 '%s $%s%s',
-                $includeTypeHins && $parameter->getType() ? 'array' : '',
+                $includeTypeHins && $parameter->getType() ? $parameter->getType()->getName() : '',
                 $parameter->getName(),
                 $parameter->isOptional() ? " = {$defaultValue}" : ''
             ));
