@@ -35,22 +35,33 @@ class UpdateIdeSupportCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|void|null
+     * @return int
      * @throws \ReflectionException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $definitionSupport = $this->generateDeploymentDefinitionSupportClass();
+        try
+        {
+            $definitionSupport = $this->generateDeploymentDefinitionSupportClass();
 
-        $targetFile = getcwd() . '/.deployee_ide_helper.php';
-        $contents = <<<EOL
+            $targetFile = getcwd() . '/.deployee_ide_helper.php';
+            $contents = <<<EOL
 <?php
 {$definitionSupport}
 
 EOL;
 
-        file_put_contents($targetFile, $contents);
-        $output->writeln(sprintf("Generated helper classes to file %s", $targetFile));
+            file_put_contents($targetFile, $contents);
+            $output->writeln(sprintf("Generated helper classes to file %s", $targetFile));
+
+            return Command::SUCCESS;
+        }
+        catch (\Error | \Exception $e)
+        {
+            $output->writeln('Failed installing | ' . $e->getMessage());
+
+            return Command::FAILURE;
+        }
     }
 
     /**
@@ -78,6 +89,7 @@ EOL;
 
         $helperMethods = implode(PHP_EOL . PHP_EOL, $helperMethods);
         $date = date('d.m.Y, H:i:s');
+
         return <<<EOL
 /**
  * This class was generated on {$date}
@@ -113,7 +125,7 @@ EOL;
 
             $signatur[] = trim(sprintf(
                 '%s $%s%s',
-                $includeTypeHins && $parameter->isArray() ? 'array' : '',
+                $includeTypeHins && $parameter->getType() ? $parameter->getType()->getName() : '',
                 $parameter->getName(),
                 $parameter->isOptional() ? " = {$defaultValue}" : ''
             ));
